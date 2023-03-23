@@ -28,6 +28,7 @@ const GameCanvas = () => {
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
         className={classes.canvas}
+        id='game'
         ref={canvasRef}
       />
     </div>

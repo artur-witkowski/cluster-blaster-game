@@ -3,35 +3,39 @@ import { Vector2 } from '../types/shared';
 import { Sprite } from './sprite';
 import characterBase from '../assets/character_base.png';
 import { DIAGONAL_FACTOR_SPEED } from '../constants/game';
-import { World } from './world';
-
-const MAX_VELOCITY = 3;
-const SPEED = 0.4;
-const CONSTANT_SPEED_LOSE = 0.92;
-const VELOCITY_THRESHOLD = 0.15;
-const TIME_BETWEEN_FRAMES_IN_MILLISECONDS = 400;
+import { Map } from './map';
+import {
+  PLAYER_CONSTANT_SPEED_LOSE,
+  PLAYER_MAX_VELOCITY,
+  PLAYER_SPEED,
+  PLAYER_TIME_BETWEEN_FRAMES_IN_MILLISECONDS,
+  PLAYER_VELOCITY_THRESHOLD,
+} from '../constants/player';
+import { Game } from './game';
 
 export class Player extends Sprite {
   private velocity: Vector2 = { x: 0, y: 0 };
   private direction: Vector2 = { x: 0, y: 0 };
-  private keyPressed: Set<typeof KEYS[keyof typeof KEYS]> = new Set();
   private image: HTMLImageElement;
   private imageProgress: number = 0;
   private lastFrameUpdateInMilliseconds: number = 0;
-  private world: World;
+  private map: Map;
+  private game: Game;
 
   constructor(
-    world: World,
+    map: Map,
+    game: Game,
     x: number,
     y: number,
     width: number,
     height: number,
-    imageUrl: string = characterBase
+    imageSrc: string = characterBase
   ) {
     super(x, y, width, height);
-    this.world = world;
+    this.map = map;
+    this.game = game;
     this.image = new Image();
-    this.image.src = imageUrl;
+    this.image.src = imageSrc;
   }
 
   renderSprite(ctx: CanvasRenderingContext2D) {
@@ -53,12 +57,12 @@ export class Player extends Sprite {
     this.updateSpriteProgress(lag);
 
     // We are constantly slowing down the player if not moving
-    if (!this.direction.x) this.velocity.x *= CONSTANT_SPEED_LOSE;
-    if (!this.direction.y) this.velocity.y *= CONSTANT_SPEED_LOSE;
-    if (Math.abs(this.velocity.x) < VELOCITY_THRESHOLD) {
+    if (!this.direction.x) this.velocity.x *= PLAYER_CONSTANT_SPEED_LOSE;
+    if (!this.direction.y) this.velocity.y *= PLAYER_CONSTANT_SPEED_LOSE;
+    if (Math.abs(this.velocity.x) < PLAYER_VELOCITY_THRESHOLD) {
       this.velocity.x = 0;
     }
-    if (Math.abs(this.velocity.y) < VELOCITY_THRESHOLD) {
+    if (Math.abs(this.velocity.y) < PLAYER_VELOCITY_THRESHOLD) {
       this.velocity.y = 0;
     }
 
@@ -71,26 +75,18 @@ export class Player extends Sprite {
     );
 
     if (this.direction.x) {
-      this.changeVelocity(this.direction.x * SPEED, 0);
+      this.changeVelocity(this.direction.x * PLAYER_SPEED, 0);
     }
     if (this.direction.y) {
-      this.changeVelocity(0, this.direction.y * SPEED);
+      this.changeVelocity(0, this.direction.y * PLAYER_SPEED);
     }
-  }
-
-  addPressedKey(key: typeof KEYS[keyof typeof KEYS]) {
-    this.keyPressed.add(key);
-  }
-
-  removePressedKey(key: typeof KEYS[keyof typeof KEYS]) {
-    this.keyPressed.delete(key);
   }
 
   private changePosition(x: number, y: number) {
     if (
-      (this.world.width - this.width > this.position.x + x &&
+      (this.map.width - this.width > this.position.x + x &&
         this.position.x + x > 0) ||
-      (this.world.width - this.width < this.position.x + x &&
+      (this.map.width - this.width < this.position.x + x &&
         this.position.x + x < 0)
     ) {
       this.position.x += x;
@@ -99,9 +95,9 @@ export class Player extends Sprite {
     }
 
     if (
-      (this.world.height - this.height > this.position.y + y &&
+      (this.map.height - this.height > this.position.y + y &&
         this.position.y + y > 0) ||
-      (this.world.height - this.height < this.position.y + y &&
+      (this.map.height - this.height < this.position.y + y &&
         this.position.y + y < 0)
     ) {
       this.position.y += y;
@@ -123,18 +119,18 @@ export class Player extends Sprite {
   }
 
   private changeVelocity(x: number, y: number) {
-    if (this.velocity.x + x > MAX_VELOCITY) {
-      this.velocity.x = MAX_VELOCITY;
-    } else if (this.velocity.x + x < -MAX_VELOCITY) {
-      this.velocity.x = -MAX_VELOCITY;
+    if (this.velocity.x + x > PLAYER_MAX_VELOCITY) {
+      this.velocity.x = PLAYER_MAX_VELOCITY;
+    } else if (this.velocity.x + x < -PLAYER_MAX_VELOCITY) {
+      this.velocity.x = -PLAYER_MAX_VELOCITY;
     } else {
       this.velocity.x += x;
     }
 
-    if (this.velocity.y + y > MAX_VELOCITY) {
-      this.velocity.y = MAX_VELOCITY;
-    } else if (this.velocity.y + y < -MAX_VELOCITY) {
-      this.velocity.y = -MAX_VELOCITY;
+    if (this.velocity.y + y > PLAYER_MAX_VELOCITY) {
+      this.velocity.y = PLAYER_MAX_VELOCITY;
+    } else if (this.velocity.y + y < -PLAYER_MAX_VELOCITY) {
+      this.velocity.y = -PLAYER_MAX_VELOCITY;
     } else {
       this.velocity.y += y;
     }
@@ -150,22 +146,28 @@ export class Player extends Sprite {
   }
 
   private updateDirections() {
-    if (this.keyPressed.has(KEYS.LEFT) && !this.keyPressed.has(KEYS.RIGHT)) {
+    if (
+      this.game.keyPressed.has(KEYS.LEFT) &&
+      !this.game.keyPressed.has(KEYS.RIGHT)
+    ) {
       this.changeDirection(-1, null);
     } else if (
-      this.keyPressed.has(KEYS.RIGHT) &&
-      !this.keyPressed.has(KEYS.LEFT)
+      this.game.keyPressed.has(KEYS.RIGHT) &&
+      !this.game.keyPressed.has(KEYS.LEFT)
     ) {
       this.changeDirection(1, null);
     } else {
       this.changeDirection(0, null);
     }
 
-    if (this.keyPressed.has(KEYS.UP) && !this.keyPressed.has(KEYS.DOWN)) {
+    if (
+      this.game.keyPressed.has(KEYS.UP) &&
+      !this.game.keyPressed.has(KEYS.DOWN)
+    ) {
       this.changeDirection(null, -1);
     } else if (
-      this.keyPressed.has(KEYS.DOWN) &&
-      !this.keyPressed.has(KEYS.UP)
+      this.game.keyPressed.has(KEYS.DOWN) &&
+      !this.game.keyPressed.has(KEYS.UP)
     ) {
       this.changeDirection(null, 1);
     } else {
@@ -177,7 +179,8 @@ export class Player extends Sprite {
     this.lastFrameUpdateInMilliseconds += lag;
 
     if (
-      this.lastFrameUpdateInMilliseconds > TIME_BETWEEN_FRAMES_IN_MILLISECONDS
+      this.lastFrameUpdateInMilliseconds >
+      PLAYER_TIME_BETWEEN_FRAMES_IN_MILLISECONDS
     ) {
       if ((this.direction.x || this.direction.y) && this.imageProgress < 3) {
         this.imageProgress++;
