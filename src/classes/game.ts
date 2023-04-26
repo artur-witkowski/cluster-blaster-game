@@ -5,7 +5,7 @@ import { Sprite } from './sprite';
 import { Map } from './map';
 
 export class Game {
-  keyPressed: Set<typeof KEYS[keyof typeof KEYS]> = new Set();
+  keyPressed: Set<(typeof KEYS)[keyof typeof KEYS]> = new Set();
   private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private lag: number;
@@ -27,7 +27,7 @@ export class Game {
     this.currentTime = 0;
     this.elapsedTime = 0;
     this.map = new Map(CANVAS_WIDTH, CANVAS_HEIGHT);
-    this.player = new Player(this.map, this, 10, 10, 50, 50);
+    this.player = new Player(this.map, this, 10, 10);
     this.start();
   }
 
@@ -84,11 +84,11 @@ export class Game {
     });
   }
 
-  private addPressedKey(key: typeof KEYS[keyof typeof KEYS]) {
+  private addPressedKey(key: (typeof KEYS)[keyof typeof KEYS]) {
     this.keyPressed.add(key);
   }
 
-  private removePressedKey(key: typeof KEYS[keyof typeof KEYS]) {
+  private removePressedKey(key: (typeof KEYS)[keyof typeof KEYS]) {
     this.keyPressed.delete(key);
   }
 
@@ -116,6 +116,7 @@ export class Game {
         break;
       case 'c':
         this.player.toggleDebugMode();
+        this.map.items.forEach((item) => item.toggleDebugMode());
         break;
       case 'l':
         this.stop();

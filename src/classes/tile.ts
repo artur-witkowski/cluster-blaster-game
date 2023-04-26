@@ -1,7 +1,6 @@
+import { DESTINATION_TILE_SIZE, ORIGINAL_TILE_SIZE } from '../constants/game';
 import { Vector2 } from '../types/shared';
 import { Sprite } from './sprite';
-
-export const TILE_SIZE = 50;
 
 export class Tile extends Sprite {
   cropPosition: Vector2;
@@ -15,10 +14,10 @@ export class Tile extends Sprite {
     y: number,
     cropPositionX: number,
     cropPositionY: number,
-    width: number,
-    height: number,
     imageSrc: string,
-    hasCollision: boolean = false
+    hasCollision: boolean = false,
+    width: number = DESTINATION_TILE_SIZE,
+    height: number = DESTINATION_TILE_SIZE
   ) {
     super(x, y, width, height);
     this.cropPosition = { x: cropPositionX, y: cropPositionY };
@@ -32,14 +31,14 @@ export class Tile extends Sprite {
   renderSprite(ctx: CanvasRenderingContext2D) {
     ctx.drawImage(
       this.image,
-      this.cropPosition.x * this.width,
-      this.cropPosition.y * this.height,
-      this.width,
-      this.height,
+      this.cropPosition.x * ORIGINAL_TILE_SIZE,
+      this.cropPosition.y * ORIGINAL_TILE_SIZE,
+      ORIGINAL_TILE_SIZE,
+      ORIGINAL_TILE_SIZE,
       this.position.x,
       this.position.y,
-      TILE_SIZE,
-      TILE_SIZE
+      this.width,
+      this.height
     );
   }
 

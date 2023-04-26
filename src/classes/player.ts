@@ -2,7 +2,10 @@ import { KEYS } from '../constants/keyboard';
 import { Vector2 } from '../types/shared';
 import { Sprite } from './sprite';
 import characterBase from '../assets/character_base.png';
-import { DIAGONAL_FACTOR_SPEED } from '../constants/game';
+import {
+  DESTINATION_TILE_SIZE,
+  DIAGONAL_FACTOR_SPEED,
+} from '../constants/game';
 import { Map } from './map';
 import {
   PLAYER_CONSTANT_SPEED_LOSE,
@@ -27,8 +30,8 @@ export class Player extends Sprite {
     game: Game,
     x: number,
     y: number,
-    width: number,
-    height: number,
+    width: number = DESTINATION_TILE_SIZE,
+    height: number = DESTINATION_TILE_SIZE,
     imageSrc: string = characterBase
   ) {
     super(x, y, width, height);
@@ -82,12 +85,31 @@ export class Player extends Sprite {
     }
   }
 
+  private wouldCollide(newPlayerPos: Vector2) {
+    let wouldCollide = false;
+
+    this.map.items.forEach((item) => {
+      if (
+        newPlayerPos.x < item.position.x + item.width &&
+        newPlayerPos.x + this.width > item.position.x &&
+        newPlayerPos.y < item.position.y + item.height &&
+        newPlayerPos.y + this.height > item.position.y
+      ) {
+        wouldCollide = true;
+        return;
+      }
+    });
+
+    return wouldCollide;
+  }
+
   private changePosition(x: number, y: number) {
     if (
-      (this.map.width - this.width > this.position.x + x &&
+      ((this.map.width - this.width > this.position.x + x &&
         this.position.x + x > 0) ||
-      (this.map.width - this.width < this.position.x + x &&
-        this.position.x + x < 0)
+        (this.map.width - this.width < this.position.x + x &&
+          this.position.x + x < 0)) &&
+      !this.wouldCollide({ x: this.position.x + x, y: this.position.y })
     ) {
       this.position.x += x;
     } else {
@@ -95,10 +117,11 @@ export class Player extends Sprite {
     }
 
     if (
-      (this.map.height - this.height > this.position.y + y &&
+      ((this.map.height - this.height > this.position.y + y &&
         this.position.y + y > 0) ||
-      (this.map.height - this.height < this.position.y + y &&
-        this.position.y + y < 0)
+        (this.map.height - this.height < this.position.y + y &&
+          this.position.y + y < 0)) &&
+      !this.wouldCollide({ x: this.position.x, y: this.position.y + y })
     ) {
       this.position.y += y;
     } else {
