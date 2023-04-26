@@ -39,6 +39,12 @@ export class Player extends Sprite {
     this.game = game;
     this.image = new Image();
     this.image.src = imageSrc;
+    this.collisionBox = {
+      x: 8,
+      y: 2,
+      width: width - 16,
+      height: height - 4,
+    };
   }
 
   renderSprite(ctx: CanvasRenderingContext2D) {
@@ -85,43 +91,66 @@ export class Player extends Sprite {
     }
   }
 
-  private wouldCollide(newPlayerPos: Vector2) {
-    let wouldCollide = false;
+  private wouldCollideWithItems(playerNewPosition: Vector2) {
+    let wouldAnyItemColliding = false;
 
     this.map.items.forEach((item) => {
       if (
-        newPlayerPos.x < item.position.x + item.width &&
-        newPlayerPos.x + this.width > item.position.x &&
-        newPlayerPos.y < item.position.y + item.height &&
-        newPlayerPos.y + this.height > item.position.y
+        item.isCollidingWith(
+          {
+            x: playerNewPosition.x,
+            y: playerNewPosition.y,
+          },
+          this.collisionBox
+        )
       ) {
-        wouldCollide = true;
+        wouldAnyItemColliding = true;
         return;
       }
     });
 
-    return wouldCollide;
+    return wouldAnyItemColliding;
   }
 
   private changePosition(x: number, y: number) {
+    if (x === 0 && y === 0) {
+      return;
+    }
+
+    // We are checking if the player would collide with any item or map borders on x axis
     if (
-      ((this.map.width - this.width > this.position.x + x &&
-        this.position.x + x > 0) ||
-        (this.map.width - this.width < this.position.x + x &&
-          this.position.x + x < 0)) &&
-      !this.wouldCollide({ x: this.position.x + x, y: this.position.y })
+      // check for collisions of the map
+      ((this.map.width >
+        this.position.x + x + this.collisionBox.x + this.collisionBox.width &&
+        this.position.x + this.collisionBox.x + x > 0) ||
+        (this.map.width <
+          this.position.x + x + this.collisionBox.x + this.collisionBox.width &&
+          this.position.x + this.collisionBox.x + x < 0)) &&
+      !this.wouldCollideWithItems({
+        x: this.position.x + x,
+        y: this.position.y,
+      })
     ) {
       this.position.x += x;
     } else {
       this.velocity.x = 0;
     }
 
+    // We are checking if the player would collide with any item or map borders on y axis
     if (
-      ((this.map.height - this.height > this.position.y + y &&
-        this.position.y + y > 0) ||
-        (this.map.height - this.height < this.position.y + y &&
-          this.position.y + y < 0)) &&
-      !this.wouldCollide({ x: this.position.x, y: this.position.y + y })
+      ((this.map.height >
+        this.position.y + y + this.collisionBox.y + this.collisionBox.height &&
+        this.position.y + this.collisionBox.y + y > 0) ||
+        (this.map.height <
+          this.position.y +
+            y +
+            this.collisionBox.y +
+            this.collisionBox.height &&
+          this.position.y + this.collisionBox.y + y < 0)) &&
+      !this.wouldCollideWithItems({
+        x: this.position.x,
+        y: this.position.y + y,
+      })
     ) {
       this.position.y += y;
     } else {

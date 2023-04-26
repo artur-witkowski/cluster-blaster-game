@@ -53,7 +53,13 @@ export class Map extends Sprite {
         y * DESTINATION_TILE_SIZE,
         4,
         5,
-        DungeonTileset
+        DungeonTileset,
+        {
+          x: 5,
+          y: 5,
+          width: DESTINATION_TILE_SIZE - 10,
+          height: DESTINATION_TILE_SIZE - 10,
+        }
       )
     );
   }

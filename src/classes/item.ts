@@ -1,3 +1,4 @@
+import { CollisionBox } from '../types/shared';
 import { Tile } from './tile';
 
 export class Item extends Tile {
@@ -10,9 +11,9 @@ export class Item extends Tile {
     cropPositionX: number,
     cropPositionY: number,
     imageSrc: string,
-    hasCollision: boolean = true
+    collisionBox: CollisionBox | null = null
   ) {
-    super(x, y, cropPositionX, cropPositionY, imageSrc, hasCollision);
+    super(x, y, cropPositionX, cropPositionY, imageSrc, collisionBox);
     this.name = name;
   }
 
