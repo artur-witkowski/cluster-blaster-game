@@ -17,8 +17,8 @@ import {
 import { Game } from './game';
 
 export class Player extends Sprite {
-  private velocity: Vector2 = { x: 0, y: 0 };
-  private direction: Vector2 = { x: 0, y: 0 };
+  private velocity: Vector2 = { x: 0, y: 0 } as Vector2;
+  private direction: Vector2 = { x: 0, y: 0 } as Vector2;
   private image: HTMLImageElement;
   private imageProgress: number = 0;
   private lastFrameUpdateInMilliseconds: number = 0;
@@ -101,7 +101,7 @@ export class Player extends Sprite {
           {
             x: playerNewPosition.x,
             y: playerNewPosition.y,
-          },
+          } as Vector2,
           this.collisionBox
         )
       ) {
@@ -123,7 +123,7 @@ export class Player extends Sprite {
           {
             x: playerNewPosition.x,
             y: playerNewPosition.y,
-          },
+          } as Vector2,
           this.collisionBox
         )
       ) {
@@ -152,11 +152,11 @@ export class Player extends Sprite {
       !this.wouldCollideWithItems({
         x: this.position.x + x,
         y: this.position.y,
-      }) &&
+      } as Vector2) &&
       !this.wouldCollideWithMapTiles({
         x: this.position.x + x,
         y: this.position.y,
-      })
+      } as Vector2)
     ) {
       this.position.x += x;
     } else {
@@ -177,11 +177,11 @@ export class Player extends Sprite {
       !this.wouldCollideWithItems({
         x: this.position.x,
         y: this.position.y + y,
-      }) &&
+      } as Vector2) &&
       !this.wouldCollideWithMapTiles({
         x: this.position.x,
         y: this.position.y + y,
-      })
+      } as Vector2)
     ) {
       this.position.y += y;
     } else {

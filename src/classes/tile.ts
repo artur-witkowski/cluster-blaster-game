@@ -4,8 +4,6 @@ import { Sprite } from './sprite';
 
 export class Tile extends Sprite {
   cropPosition: Vector2;
-  width: number;
-  height: number;
   image: HTMLImageElement;
   hasCollision: boolean;
 
@@ -27,7 +25,7 @@ export class Tile extends Sprite {
       height,
       collisionBox
     );
-    this.cropPosition = { x: cropPositionX, y: cropPositionY };
+    this.cropPosition = { x: cropPositionX, y: cropPositionY } as Vector2;
     this.width = width;
     this.height = height;
     this.image = new Image();

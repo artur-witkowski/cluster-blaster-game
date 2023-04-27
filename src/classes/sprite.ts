@@ -1,7 +1,7 @@
 import { CollisionBox, Vector2 } from '../types/shared';
 
 export abstract class Sprite {
-  position: Vector2 = { x: 0, y: 0 };
+  position: Vector2 = { x: 0, y: 0 } as Vector2;
   width: number;
   height: number;
   collisionBox: CollisionBox;
