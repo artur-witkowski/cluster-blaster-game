@@ -27,12 +27,15 @@ export class Game {
     this.currentTime = 0;
     this.elapsedTime = 0;
     this.map = new Map(CANVAS_WIDTH, CANVAS_HEIGHT);
-    this.player = new Player(this.map, this, 10, 10);
+    this.player = new Player(this.map, this, 100, 100);
+
     this.start();
   }
 
   start() {
     this.ctx.imageSmoothingEnabled = false;
+
+    this.map.setDefaultMap();
 
     this.sprites.push(this.map);
     this.sprites.push(this.player);
@@ -117,6 +120,7 @@ export class Game {
       case 'c':
         this.player.toggleDebugMode();
         this.map.items.forEach((item) => item.toggleDebugMode());
+        this.map.tiles.forEach((tile) => tile.toggleDebugMode());
         break;
       case 'l':
         this.stop();

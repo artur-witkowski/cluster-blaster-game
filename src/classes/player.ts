@@ -45,6 +45,7 @@ export class Player extends Sprite {
       width: width - 16,
       height: height - 4,
     };
+    this.hasCollision = true;
   }
 
   renderSprite(ctx: CanvasRenderingContext2D) {
@@ -112,6 +113,28 @@ export class Player extends Sprite {
     return wouldAnyItemColliding;
   }
 
+  private wouldCollideWithMapTiles(playerNewPosition: Vector2) {
+    let wouldAnyTileColliding = false;
+
+    this.map.tiles.forEach((tile) => {
+      if (
+        tile.hasCollision &&
+        tile.isCollidingWith(
+          {
+            x: playerNewPosition.x,
+            y: playerNewPosition.y,
+          },
+          this.collisionBox
+        )
+      ) {
+        wouldAnyTileColliding = true;
+        return;
+      }
+    });
+
+    return wouldAnyTileColliding;
+  }
+
   private changePosition(x: number, y: number) {
     if (x === 0 && y === 0) {
       return;
@@ -127,6 +150,10 @@ export class Player extends Sprite {
           this.position.x + x + this.collisionBox.x + this.collisionBox.width &&
           this.position.x + this.collisionBox.x + x < 0)) &&
       !this.wouldCollideWithItems({
+        x: this.position.x + x,
+        y: this.position.y,
+      }) &&
+      !this.wouldCollideWithMapTiles({
         x: this.position.x + x,
         y: this.position.y,
       })
@@ -148,6 +175,10 @@ export class Player extends Sprite {
             this.collisionBox.height &&
           this.position.y + this.collisionBox.y + y < 0)) &&
       !this.wouldCollideWithItems({
+        x: this.position.x,
+        y: this.position.y + y,
+      }) &&
+      !this.wouldCollideWithMapTiles({
         x: this.position.x,
         y: this.position.y + y,
       })

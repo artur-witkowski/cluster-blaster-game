@@ -5,6 +5,7 @@ export abstract class Sprite {
   width: number;
   height: number;
   collisionBox: CollisionBox;
+  hasCollision: boolean = false;
   protected isDebugMode: boolean = false;
 
   constructor(
@@ -12,7 +13,8 @@ export abstract class Sprite {
     y: number,
     width: number,
     height: number,
-    collisionBox: CollisionBox | null = null
+    collisionBox: CollisionBox | null = null,
+    hasCollision: boolean = false
   ) {
     this.position.x = x;
     this.position.y = y;
@@ -24,6 +26,7 @@ export abstract class Sprite {
       width: this.width,
       height: this.height,
     };
+    this.hasCollision = hasCollision;
   }
 
   render(ctx: CanvasRenderingContext2D) {
@@ -36,7 +39,7 @@ export abstract class Sprite {
   abstract update(lagOffset: number): void;
 
   renderCollisionBox(ctx: CanvasRenderingContext2D) {
-    if (!this.isDebugMode) return;
+    if (!this.isDebugMode || !this.hasCollision) return;
     ctx.globalAlpha = 0.2;
     ctx.fillStyle = 'red';
     ctx.strokeStyle = 'red';
@@ -67,6 +70,7 @@ export abstract class Sprite {
     const thisBottom = thisTop + this.collisionBox.height;
 
     return (
+      this.hasCollision &&
       spriteLeft < thisRight &&
       spriteRight > thisLeft &&
       spriteTop < thisBottom &&

@@ -11,9 +11,18 @@ export class Item extends Tile {
     cropPositionX: number,
     cropPositionY: number,
     imageSrc: string,
-    collisionBox: CollisionBox | null = null
+    collisionBox: CollisionBox | null = null,
+    hasCollision: boolean = true
   ) {
-    super(x, y, cropPositionX, cropPositionY, imageSrc, collisionBox);
+    super(
+      x,
+      y,
+      cropPositionX,
+      cropPositionY,
+      imageSrc,
+      collisionBox,
+      hasCollision
+    );
     this.name = name;
   }
 
