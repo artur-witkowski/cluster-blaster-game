@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Game } from '../../classes/game';
+import { Game } from '../../game/classes/game';
 
 type Props = {
   canvasRef: React.RefObject<HTMLCanvasElement>;

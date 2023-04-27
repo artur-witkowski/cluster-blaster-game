@@ -1,6 +1,6 @@
 import { DESTINATION_TILE_SIZE, ORIGINAL_TILE_SIZE } from '../constants/game';
 import { CollisionBox, Vector2 } from '../types/shared';
-import { degreesToRadians } from '../utils/math';
+import { degreesToRadians } from '../../utils/math';
 import { Sprite } from './sprite';
 
 export class Tile extends Sprite {

@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { createUseStyles } from 'react-jss';
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../constants/game';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../game/constants/game';
 
 import { useInitGame } from './useInitGame';
 
