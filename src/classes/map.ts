@@ -26,22 +26,33 @@ export class Map extends Sprite {
   setDefaultMap() {
     setMapGround(this);
     setMapWalls(this);
-    setMapDoor(this, { x: 6, y: 0 } as Coords, DOORS_POSITION.UP);
+    setMapDoor(this, { x: 10, y: 0 } as Coords, DOORS_POSITION.UP);
     setMapDoor(
       this,
-      { x: this.width / DESTINATION_TILE_SIZE - 1, y: 6 } as Coords,
+      {
+        x: this.width / DESTINATION_TILE_SIZE - 1,
+        y: 7,
+      } as Coords,
       DOORS_POSITION.RIGHT
     );
     setMapDoor(
       this,
-      { x: 6, y: this.height / DESTINATION_TILE_SIZE - 1 } as Coords,
+      {
+        x: 10,
+        y: this.height / DESTINATION_TILE_SIZE - 1,
+      } as Coords,
       DOORS_POSITION.DOWN
     );
-    setMapDoor(this, { x: 0, y: 6 } as Coords, DOORS_POSITION.LEFT);
+    setMapDoor(this, { x: 0, y: 7 } as Coords, DOORS_POSITION.LEFT);
 
     for (let i = 0; i < 10; i++) {
       this.createChest(this.getRandomEmptyItemCoords());
     }
+  }
+
+  resetMap() {
+    this.tiles = [];
+    this.items = [];
   }
 
   createChest(coords: Coords) {

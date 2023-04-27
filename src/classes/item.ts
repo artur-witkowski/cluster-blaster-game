@@ -12,7 +12,8 @@ export class Item extends Tile {
     cropPositionY: number,
     imageSrc: string,
     collisionBox: CollisionBox | null = null,
-    hasCollision: boolean = true
+    hasCollision: boolean = true,
+    rotation: number = 0
   ) {
     super(
       x,
@@ -21,7 +22,8 @@ export class Item extends Tile {
       cropPositionY,
       imageSrc,
       collisionBox,
-      hasCollision
+      hasCollision,
+      rotation
     );
     this.name = name;
   }

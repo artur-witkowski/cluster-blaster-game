@@ -122,6 +122,13 @@ export class Game {
         this.map.items.forEach((item) => item.toggleDebugMode());
         this.map.tiles.forEach((tile) => tile.toggleDebugMode());
         break;
+      case 'r':
+        this.map.resetMap();
+        this.map.setDefaultMap();
+        this.player.position.x = 100;
+        this.player.position.y = 100;
+        if (this.player.getDebugMode()) this.player.toggleDebugMode();
+        break;
       case 'l':
         this.stop();
         break;

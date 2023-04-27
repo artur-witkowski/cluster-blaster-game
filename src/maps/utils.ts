@@ -2,7 +2,7 @@ import { Tile } from '../classes/tile';
 import { DESTINATION_TILE_SIZE } from '../constants/game';
 import DungeonTileset from '../assets/dungeon_tileset.png';
 import { Map } from '../classes/map';
-import { Coords, DoorsPosition, Vector2 } from '../types/shared';
+import { Coords, DoorsPosition } from '../types/shared';
 import { Item } from '../classes/item';
 import { DOORS_POSITION } from '../constants/doors';
 

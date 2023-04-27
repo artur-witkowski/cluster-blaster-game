@@ -5,6 +5,10 @@ export abstract class Sprite {
   width: number;
   height: number;
   collisionBox: CollisionBox;
+  /**
+   * Rotation in radians
+   */
+  rotation: number;
   hasCollision: boolean = false;
   protected isDebugMode: boolean = false;
 
@@ -14,7 +18,8 @@ export abstract class Sprite {
     width: number,
     height: number,
     collisionBox: CollisionBox | null = null,
-    hasCollision: boolean = false
+    hasCollision: boolean = false,
+    rotation: number = 0
   ) {
     this.position.x = x;
     this.position.y = y;
@@ -27,6 +32,7 @@ export abstract class Sprite {
       height: this.height,
     };
     this.hasCollision = hasCollision;
+    this.rotation = rotation;
   }
 
   render(ctx: CanvasRenderingContext2D) {
@@ -80,5 +86,9 @@ export abstract class Sprite {
 
   toggleDebugMode() {
     this.isDebugMode = !this.isDebugMode;
+  }
+
+  getDebugMode() {
+    return this.isDebugMode;
   }
 }

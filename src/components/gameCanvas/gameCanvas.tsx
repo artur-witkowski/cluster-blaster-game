@@ -6,14 +6,31 @@ import { useInitGame } from './useInitGame';
 
 const useStyles = createUseStyles({
   canvasContainer: {
+    position: 'relative',
     height: '100vh',
     width: '100vw',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
+    background: `radial-gradient(circle, rgba(24,19,38,1) 30%, rgba(55,46,80,1) 100%)`,
   },
   canvas: {
     border: '1px solid #000000',
+    borderRadius: '10px',
+    boxShadow: '0px 0px 10px 0px rgba(0,0,0,0.75)',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+  },
+  controls: {
+    position: 'absolute',
+    top: '10px',
+    left: '10px',
+    color: '#ffffff',
+    fontSize: '1.5rem',
+
+    '& h1': {
+      fontSize: '2rem',
+      fontWeight: 'bold',
+    },
   },
 });
 
@@ -24,6 +41,13 @@ const GameCanvas = () => {
 
   return (
     <div className={classes.canvasContainer}>
+      <div className={classes.controls}>
+        <h1>Controls:</h1>
+        WASD - Move
+        <br />
+        C - Toggle collision borders
+        <br />R - Reset map
+      </div>
       <canvas
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
