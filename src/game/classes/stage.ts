@@ -9,6 +9,7 @@ import { DESTINATION_TILE_SIZE } from '../constants/game';
 import { Renderable } from './renderable';
 import { DOOR_POSITION } from '../constants/doors';
 import { Player } from './player';
+import { BackdropRoomChangeAnimation } from './backdropRoomChangeAnimation';
 
 export class Stage extends Renderable {
   id: StageId;
@@ -16,7 +17,7 @@ export class Stage extends Renderable {
   rooms: Room[];
   player: Player;
   currentRoomId: RoomId;
-  private enteredDoor: Door | null = null;
+  backdropRoomChangeAnimation: BackdropRoomChangeAnimation;
 
   constructor(
     name: string,
@@ -29,6 +30,16 @@ export class Stage extends Renderable {
     this.name = name;
     this.rooms = rooms;
     this.player = player;
+    const backdropRoomChangeAnimation = new BackdropRoomChangeAnimation(
+      (enteredDoor) => {
+        this.setCurrentRoom(enteredDoor.targetRoomId);
+        player.setCoordsPosition(enteredDoor.targetCoords);
+      },
+      () => {
+        player.isBlockedMoving = false;
+      }
+    );
+    this.backdropRoomChangeAnimation = backdropRoomChangeAnimation;
     this.currentRoomId = currentRoomId || rooms[0].id;
   }
 
@@ -40,10 +51,6 @@ export class Stage extends Renderable {
     if (!currentRoom) return;
 
     currentRoom.render(ctx);
-
-    if (this.enteredDoor) {
-      this.animateDoorEnter(ctx);
-    }
   }
 
   update(lagOffset: number): void {
@@ -56,22 +63,11 @@ export class Stage extends Renderable {
 
       // Change room if player entered door
       if (isPlayerEnteredDoor) {
-        this.enteredDoor = door;
+        this.backdropRoomChangeAnimation.setEnteredDoor(door);
+        this.player.stopMoving();
+        this.player.isBlockedMoving = true;
       }
     });
-  }
-
-  animateDoorEnter(ctx: CanvasRenderingContext2D) {
-    if (this.enteredDoor === null) return;
-
-    console.log('animate');
-    ctx.globalAlpha = 0.1;
-
-    this.player.stopMoving();
-    this.setCurrentRoom(this.enteredDoor.targetRoomId);
-    this.player.setCoordsPosition(this.enteredDoor.targetCoords);
-
-    this.enteredDoor = null;
   }
 
   setCurrentRoom(roomId: RoomId) {

@@ -16,6 +16,7 @@ import {
 import { Game } from './game';
 
 export class Player extends Sprite {
+  isBlockedMoving: boolean = false;
   private velocity: Vector2 = { x: 0, y: 0 } as Vector2;
   private direction: Vector2 = { x: 0, y: 0 } as Vector2;
   private image: HTMLImageElement;
@@ -61,6 +62,8 @@ export class Player extends Sprite {
   update(lag: number) {
     this.updateDirections();
     this.updateSpriteProgress(lag);
+
+    if (this.isBlockedMoving) return;
 
     // We are constantly slowing down the player if not moving
     if (!this.direction.x) this.velocity.x *= PLAYER_CONSTANT_SPEED_LOSE;

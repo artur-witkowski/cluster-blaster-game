@@ -46,6 +46,7 @@ export class Game {
 
     this.renderables.push(this.stage);
     this.renderables.push(this.player);
+    this.renderables.push(this.stage.backdropRoomChangeAnimation);
 
     window.addEventListener('keydown', this.handleKeyboardKeydown);
     window.addEventListener('keyup', this.handleKeyboardKeyup);
@@ -94,9 +95,7 @@ export class Game {
   private render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.renderables.forEach((sprite) => {
-      this.ctx.save();
       sprite.render(this.ctx);
-      this.ctx.restore();
     });
   }
 
