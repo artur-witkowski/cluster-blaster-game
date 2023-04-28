@@ -2,20 +2,21 @@ import { Tile } from './tile';
 import DungeonTileset from '../assets/dungeon_tileset.png';
 import { Sprite } from './sprite';
 import { Item } from './item';
-import { DESTINATION_TILE_SIZE } from '../constants/game';
-import { Coords, Vector2 } from '../types/shared';
 import {
-  setGroundMap as setMapGround,
-  setMapDoor,
-  setMapWalls,
-} from '../maps/utils';
-import { DOORS_POSITION } from '../constants/doors';
+  CANVAS_HEIGHT,
+  CANVAS_WIDTH,
+  DESTINATION_TILE_SIZE,
+} from '../constants/game';
+import { Coords, Vector2 } from '../types/shared';
+import { setGroundMap as setMapGround, setMapWalls } from '../maps/utils';
+import { Door } from './door';
 
 export class Map extends Sprite {
   width: number;
   height: number;
   tiles: Tile[] = [];
   items: Item[] = [];
+  doors: Door[] = [];
 
   constructor(width: number, height: number) {
     super(0, 0, width, height);
@@ -26,26 +27,8 @@ export class Map extends Sprite {
   setDefaultMap() {
     setMapGround(this);
     setMapWalls(this);
-    setMapDoor(this, { x: 10, y: 0 } as Coords, DOORS_POSITION.UP);
-    setMapDoor(
-      this,
-      {
-        x: this.width / DESTINATION_TILE_SIZE - 1,
-        y: 7,
-      } as Coords,
-      DOORS_POSITION.RIGHT
-    );
-    setMapDoor(
-      this,
-      {
-        x: 10,
-        y: this.height / DESTINATION_TILE_SIZE - 1,
-      } as Coords,
-      DOORS_POSITION.DOWN
-    );
-    setMapDoor(this, { x: 0, y: 7 } as Coords, DOORS_POSITION.LEFT);
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 3; i++) {
       this.createChest(this.getRandomEmptyItemCoords());
     }
   }
@@ -53,6 +36,24 @@ export class Map extends Sprite {
   resetMap() {
     this.tiles = [];
     this.items = [];
+  }
+
+  removeDoors() {
+    this.doors = [];
+  }
+
+  addDoors(doors: Door[]) {
+    this.doors = doors;
+    doors.forEach((door) => {
+      const [doorTiles, doorItems] = door.getDoorRenderElements();
+      doorTiles.forEach((doorTile) => {
+        this.setTile(doorTile);
+      });
+
+      doorItems.forEach((doorItem) => {
+        this.setItem(doorItem);
+      });
+    });
   }
 
   createChest(coords: Coords) {
@@ -127,5 +128,11 @@ export class Map extends Sprite {
     }
 
     return this.getRandomEmptyItemCoords();
+  }
+
+  static getDefaultMap(): Map {
+    const map = new Map(CANVAS_WIDTH, CANVAS_HEIGHT);
+    map.setDefaultMap();
+    return map;
   }
 }

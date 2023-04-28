@@ -1,6 +1,8 @@
-import { CollisionBox, Vector2 } from '../types/shared';
+import { DESTINATION_TILE_SIZE } from '../constants/game';
+import { CollisionBox, Coords, Vector2 } from '../types/shared';
+import { Renderable } from './renderable';
 
-export abstract class Sprite {
+export abstract class Sprite extends Renderable {
   position: Vector2 = { x: 0, y: 0 } as Vector2;
   width: number;
   height: number;
@@ -21,6 +23,7 @@ export abstract class Sprite {
     hasCollision: boolean = false,
     rotation: number = 0
   ) {
+    super();
     this.position.x = x;
     this.position.y = y;
     this.width = width;
@@ -59,6 +62,11 @@ export abstract class Sprite {
     ctx.fill();
     ctx.globalAlpha = 1.0;
     ctx.stroke();
+  }
+
+  setCoordsPosition(coords: Coords) {
+    this.position.x = coords.x * DESTINATION_TILE_SIZE;
+    this.position.y = coords.y * DESTINATION_TILE_SIZE;
   }
 
   isCollidingWith(

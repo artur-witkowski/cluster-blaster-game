@@ -1,8 +1,13 @@
-import { CANVAS_HEIGHT, CANVAS_WIDTH, FPS_LIMIT } from '../constants/game';
+import {
+  CANVAS_HEIGHT,
+  CANVAS_WIDTH,
+  DESTINATION_TILE_SIZE,
+  FPS_LIMIT,
+} from '../constants/game';
 import { KEYS } from '../constants/keyboard';
 import { Player } from './player';
-import { Sprite } from './sprite';
-import { Map } from './map';
+import { Stage } from './stage';
+import { Renderable } from './renderable';
 
 export class Game {
   keyPressed: Set<(typeof KEYS)[keyof typeof KEYS]> = new Set();
@@ -13,9 +18,9 @@ export class Game {
   private startTime: number;
   private currentTime: number;
   private elapsedTime: number;
-  private map: Map;
+  private stage: Stage;
   private player: Player;
-  private sprites: Sprite[] = [];
+  private renderables: Renderable[] = [];
   private animationFrame: number = 0;
 
   constructor(canvas: HTMLCanvasElement) {
@@ -26,8 +31,12 @@ export class Game {
     this.startTime = Date.now();
     this.currentTime = 0;
     this.elapsedTime = 0;
-    this.map = new Map(CANVAS_WIDTH, CANVAS_HEIGHT);
-    this.player = new Player(this.map, this, 100, 100);
+    this.player = new Player(
+      this,
+      CANVAS_WIDTH / 2 - DESTINATION_TILE_SIZE / 2,
+      CANVAS_HEIGHT / 2 - DESTINATION_TILE_SIZE / 2
+    );
+    this.stage = Stage.getThreeHorizontalRoomsStage(this.player);
 
     this.start();
   }
@@ -35,10 +44,8 @@ export class Game {
   start() {
     this.ctx.imageSmoothingEnabled = false;
 
-    this.map.setDefaultMap();
-
-    this.sprites.push(this.map);
-    this.sprites.push(this.player);
+    this.renderables.push(this.stage);
+    this.renderables.push(this.player);
 
     window.addEventListener('keydown', this.handleKeyboardKeydown);
     window.addEventListener('keyup', this.handleKeyboardKeyup);
@@ -53,6 +60,10 @@ export class Game {
     window.removeEventListener('keyup', this.handleKeyboardKeyup);
     window.removeEventListener('keydown', this.handleKeyboardKeydown);
     console.log('Game stopped');
+  }
+
+  getStage() {
+    return this.stage;
   }
 
   private loop() {
@@ -71,16 +82,18 @@ export class Game {
   }
 
   private update() {
-    this.sprites.forEach((sprite) => {
+    this.renderables.forEach((renderItem) => {
       this.ctx.save();
-      sprite.update(this.lag);
+      if ('update' in renderItem && typeof renderItem.update === 'function') {
+        renderItem.update(this.lag);
+      }
       this.ctx.restore();
     });
   }
 
   private render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.sprites.forEach((sprite) => {
+    this.renderables.forEach((sprite) => {
       this.ctx.save();
       sprite.render(this.ctx);
       this.ctx.restore();
@@ -119,14 +132,22 @@ export class Game {
         break;
       case 'c':
         this.player.toggleDebugMode();
-        this.map.items.forEach((item) => item.toggleDebugMode());
-        this.map.tiles.forEach((tile) => tile.toggleDebugMode());
+        this.stage
+          .getCurrentRoom()
+          ?.map.items.forEach((item) => item.toggleDebugMode());
+        this.stage
+          .getCurrentRoom()
+          ?.map.tiles.forEach((tile) => tile.toggleDebugMode());
         break;
       case 'r':
-        this.map.resetMap();
-        this.map.setDefaultMap();
-        this.player.position.x = 100;
-        this.player.position.y = 100;
+        this.player = new Player(
+          this,
+          CANVAS_WIDTH / 2 - DESTINATION_TILE_SIZE / 2,
+          CANVAS_HEIGHT / 2 - DESTINATION_TILE_SIZE / 2
+        );
+        this.stage = Stage.getThreeHorizontalRoomsStage(this.player);
+        this.renderables = [];
+        this.start();
         if (this.player.getDebugMode()) this.player.toggleDebugMode();
         break;
       case 'l':

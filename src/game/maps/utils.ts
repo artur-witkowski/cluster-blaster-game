@@ -2,9 +2,9 @@ import { Tile } from '../classes/tile';
 import { DESTINATION_TILE_SIZE } from '../constants/game';
 import DungeonTileset from '../assets/dungeon_tileset.png';
 import { Map } from '../classes/map';
-import { Coords, DoorsPosition } from '../types/shared';
+import { Coords, DoorPosition } from '../types/shared';
 import { Item } from '../classes/item';
-import { DOORS_POSITION } from '../constants/doors';
+import { DOOR_POSITION } from '../constants/doors';
 
 export const setGroundMap = (map: Map): void => {
   for (let x = 0; x < map.width / DESTINATION_TILE_SIZE; x++) {
@@ -68,10 +68,10 @@ export const setMapWalls = (map: Map): void => {
 export const setMapDoor = (
   map: Map,
   coords: Coords,
-  direction: DoorsPosition
+  direction: DoorPosition
 ): void => {
   const { x, y } = coords;
-  if (direction === DOORS_POSITION.UP) {
+  if (direction === DOOR_POSITION.UP) {
     map.setItem(new Item('Door', x - 1, y, 0, 3, DungeonTileset, null, true));
     map.setItem(
       new Item(
@@ -87,7 +87,7 @@ export const setMapDoor = (
     );
     map.setItem(new Item('Door', x + 1, y, 2, 3, DungeonTileset, null, true));
     map.setTile(new Tile(x, y, 1, 1, DungeonTileset, null, false));
-  } else if (direction === DOORS_POSITION.DOWN) {
+  } else if (direction === DOOR_POSITION.DOWN) {
     map.setItem(new Item('Door', x - 1, y, 0, 4, DungeonTileset, null, true));
     map.setItem(
       new Item(
@@ -108,7 +108,7 @@ export const setMapDoor = (
     );
     map.setItem(new Item('Door', x + 1, y, 2, 4, DungeonTileset, null, true));
     map.setTile(new Tile(x, y, 1, 1, DungeonTileset, null, false));
-  } else if (direction === DOORS_POSITION.LEFT) {
+  } else if (direction === DOOR_POSITION.LEFT) {
     map.setItem(new Item('Door', x, y - 1, 3, 2, DungeonTileset, null, true));
     map.setItem(
       new Item(
@@ -129,7 +129,7 @@ export const setMapDoor = (
     );
     map.setItem(new Item('Door', x, y + 1, 3, 4, DungeonTileset, null, true));
     map.setTile(new Tile(x, y, 1, 1, DungeonTileset, null, false));
-  } else if (direction === DOORS_POSITION.RIGHT) {
+  } else if (direction === DOOR_POSITION.RIGHT) {
     map.setItem(new Item('Door', x, y - 1, 4, 2, DungeonTileset, null, true));
     map.setItem(
       new Item(

@@ -1,12 +1,11 @@
 import { KEYS } from '../constants/keyboard';
-import { Vector2 } from '../types/shared';
+import { Coords, Vector2 } from '../types/shared';
 import { Sprite } from './sprite';
 import characterBase from '../assets/character_base.png';
 import {
   DESTINATION_TILE_SIZE,
   DIAGONAL_FACTOR_SPEED,
 } from '../constants/game';
-import { Map } from './map';
 import {
   PLAYER_CONSTANT_SPEED_LOSE,
   PLAYER_MAX_VELOCITY,
@@ -22,11 +21,9 @@ export class Player extends Sprite {
   private image: HTMLImageElement;
   private imageProgress: number = 0;
   private lastFrameUpdateInMilliseconds: number = 0;
-  private map: Map;
   private game: Game;
 
   constructor(
-    map: Map,
     game: Game,
     x: number,
     y: number,
@@ -35,7 +32,6 @@ export class Player extends Sprite {
     imageSrc: string = characterBase
   ) {
     super(x, y, width, height);
-    this.map = map;
     this.game = game;
     this.image = new Image();
     this.image.src = imageSrc;
@@ -92,10 +88,24 @@ export class Player extends Sprite {
     }
   }
 
+  stopMoving() {
+    this.velocity = { x: 0, y: 0 } as Vector2;
+  }
+
+  getCoords(): Coords {
+    return {
+      x: Math.round(this.position.x / DESTINATION_TILE_SIZE),
+      y: Math.round(this.position.y / DESTINATION_TILE_SIZE),
+    } as Coords;
+  }
+
   private wouldCollideWithItems(playerNewPosition: Vector2) {
     let wouldAnyItemColliding = false;
+    const map = this.game.getStage().getCurrentRoom()?.map;
 
-    this.map.items.forEach((item) => {
+    if (!map) return;
+
+    map.items.forEach((item) => {
       if (
         item.isCollidingWith(
           {
@@ -115,8 +125,11 @@ export class Player extends Sprite {
 
   private wouldCollideWithMapTiles(playerNewPosition: Vector2) {
     let wouldAnyTileColliding = false;
+    const map = this.game.getStage().getCurrentRoom()?.map;
 
-    this.map.tiles.forEach((tile) => {
+    if (!map) return;
+
+    map.tiles.forEach((tile) => {
       if (
         tile.hasCollision &&
         tile.isCollidingWith(
@@ -136,17 +149,18 @@ export class Player extends Sprite {
   }
 
   private changePosition(x: number, y: number) {
-    if (x === 0 && y === 0) {
+    const map = this.game.getStage().getCurrentRoom()?.map;
+    if ((x === 0 && y === 0) || !map) {
       return;
     }
 
     // We are checking if the player would collide with any item or map borders on x axis
     if (
       // check for collisions of the map
-      ((this.map.width >
+      ((map.width >
         this.position.x + x + this.collisionBox.x + this.collisionBox.width &&
         this.position.x + this.collisionBox.x + x > 0) ||
-        (this.map.width <
+        (map.width <
           this.position.x + x + this.collisionBox.x + this.collisionBox.width &&
           this.position.x + this.collisionBox.x + x < 0)) &&
       !this.wouldCollideWithItems({
@@ -165,10 +179,10 @@ export class Player extends Sprite {
 
     // We are checking if the player would collide with any item or map borders on y axis
     if (
-      ((this.map.height >
+      ((map.height >
         this.position.y + y + this.collisionBox.y + this.collisionBox.height &&
         this.position.y + this.collisionBox.y + y > 0) ||
-        (this.map.height <
+        (map.height <
           this.position.y +
             y +
             this.collisionBox.y +

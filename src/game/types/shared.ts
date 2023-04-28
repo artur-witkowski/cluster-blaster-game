@@ -1,4 +1,4 @@
-import { DOORS_POSITION } from '../constants/doors';
+import { DOOR_POSITION } from '../constants/doors';
 
 export type Vector2 = {
   x: number;
@@ -10,8 +10,7 @@ export type Coords = {
   y: number;
 } & { readonly Coords: unique symbol };
 
-export type DoorsPosition =
-  (typeof DOORS_POSITION)[keyof typeof DOORS_POSITION];
+export type DoorPosition = (typeof DOOR_POSITION)[keyof typeof DOOR_POSITION];
 
 export type CollisionBox = {
   x: number;
