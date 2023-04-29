@@ -129,6 +129,9 @@ export class Game {
       case 'd':
         this.addPressedKey(KEYS.RIGHT);
         break;
+      case 'e':
+        this.player.action();
+        break;
       case 'c':
         this.player.toggleDebugMode();
         this.stage

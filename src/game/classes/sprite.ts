@@ -92,6 +92,30 @@ export abstract class Sprite extends Renderable {
     );
   }
 
+  isNearPosition(
+    position: Vector2,
+    spriteCollisionBox: CollisionBox,
+    distance: number = DESTINATION_TILE_SIZE / 4
+  ): boolean {
+    const spriteLeft = position.x + spriteCollisionBox.x;
+    const spriteRight = spriteLeft + spriteCollisionBox.width;
+    const spriteTop = position.y + spriteCollisionBox.y;
+    const spriteBottom = spriteTop + spriteCollisionBox.height;
+
+    const thisLeft = this.position.x + this.collisionBox.x;
+    const thisRight = thisLeft + this.collisionBox.width;
+    const thisTop = this.position.y + this.collisionBox.y;
+    const thisBottom = thisTop + this.collisionBox.height;
+
+    return (
+      this.hasCollision &&
+      spriteLeft < thisRight + distance &&
+      spriteRight > thisLeft - distance &&
+      spriteTop < thisBottom + distance &&
+      spriteBottom > thisTop - distance
+    );
+  }
+
   toggleDebugMode() {
     this.isDebugMode = !this.isDebugMode;
   }

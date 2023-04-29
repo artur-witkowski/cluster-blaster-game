@@ -3,6 +3,8 @@ import { Tile } from './tile';
 
 export class Item extends Tile {
   name: string;
+  action: (() => void) | null = null;
+  isHover: boolean = false;
 
   constructor(
     name: string,

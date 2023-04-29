@@ -1,5 +1,4 @@
 import { Tile } from './tile';
-import DungeonTileset from '../assets/dungeon_tileset.png';
 import { Sprite } from './sprite';
 import { Item } from './item';
 import {
@@ -10,6 +9,7 @@ import {
 import { Coords, Vector2 } from '../types/shared';
 import { setGroundMap as setMapGround, setMapWalls } from '../maps/utils';
 import { Door } from './door';
+import { Chest } from './chest';
 
 export class Map extends Sprite {
   width: number;
@@ -57,14 +57,7 @@ export class Map extends Sprite {
   }
 
   createChest(coords: Coords) {
-    this.setItem(
-      new Item('Chest', coords.x, coords.y, 4, 5, DungeonTileset, {
-        x: 5,
-        y: 5,
-        width: DESTINATION_TILE_SIZE - 10,
-        height: DESTINATION_TILE_SIZE - 10,
-      })
-    );
+    this.setItem(new Chest(coords.x, coords.y));
   }
 
   setItem(item: Item) {

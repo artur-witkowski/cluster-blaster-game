@@ -89,6 +89,41 @@ export class Player extends Sprite {
     if (this.direction.y) {
       this.changeVelocity(0, this.direction.y * PLAYER_SPEED);
     }
+
+    // Hover items that has actions
+    this.hoverItems();
+  }
+
+  hoverItems() {
+    const map = this.game.getStage().getCurrentRoom()?.map;
+
+    if (!map) return;
+
+    map.items.forEach((item) => {
+      if (
+        item.action &&
+        item.isNearPosition(this.position, this.collisionBox)
+      ) {
+        item.isHover = true;
+      } else {
+        item.isHover = false;
+      }
+    });
+  }
+
+  action() {
+    const map = this.game.getStage().getCurrentRoom()?.map;
+
+    if (!map) return;
+
+    map.items.forEach((item) => {
+      if (
+        item.action &&
+        item.isNearPosition(this.position, this.collisionBox)
+      ) {
+        item.action();
+      }
+    });
   }
 
   stopMoving() {

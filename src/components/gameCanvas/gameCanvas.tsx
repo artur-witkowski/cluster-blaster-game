@@ -46,7 +46,7 @@ const GameCanvas = () => {
         WASD - Move
         <br />
         C - Toggle collision borders
-        <br />R - Reset map
+        <br />R - Reset map <br />E - Action
       </div>
       <canvas
         width={CANVAS_WIDTH}
