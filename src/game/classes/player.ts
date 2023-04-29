@@ -115,7 +115,7 @@ export class Player extends Sprite {
     const map = this.game.getStage().getCurrentRoom()?.map;
 
     if (!map) return;
-
+    console.log('test');
     map.items.forEach((item) => {
       if (
         item.action &&
