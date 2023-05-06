@@ -1,3 +1,4 @@
+import { COLORS } from '../../utils/colors';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../constants/game';
 import { Door } from './door';
 import { Renderable } from './renderable';
@@ -22,7 +23,7 @@ export class BackdropRoomChangeAnimation extends Renderable {
     if (this.enteredDoor) {
       ctx.save();
       ctx.globalAlpha = this.opacity;
-      ctx.fillStyle = 'rgba(24,19,38,1)';
+      ctx.fillStyle = COLORS.backgroundColorDark;
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
       ctx.restore();
     }

@@ -3,13 +3,14 @@ import { createUseStyles } from 'react-jss';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../game/constants/game';
 
 import { useInitGame } from './useInitGame';
+import { COLORS } from '../../utils/colors';
 
 const useStyles = createUseStyles({
   canvasContainer: {
     position: 'relative',
     height: '100vh',
     width: '100vw',
-    background: `radial-gradient(circle, rgba(24,19,38,1) 30%, rgba(55,46,80,1) 100%)`,
+    background: `radial-gradient(circle, ${COLORS.backgroundColorDark} 30%, ${COLORS.backgroundColorLight} 100%)`,
   },
   canvas: {
     border: '1px solid #000000',

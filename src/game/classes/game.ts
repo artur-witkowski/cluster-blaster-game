@@ -8,6 +8,7 @@ import { KEYS } from '../constants/keyboard';
 import { Player } from './player';
 import { Stage } from './stage';
 import { Renderable } from './renderable';
+import { Minimap } from './minimap';
 
 export class Game {
   keyPressed: Set<(typeof KEYS)[keyof typeof KEYS]> = new Set();
@@ -20,6 +21,7 @@ export class Game {
   private elapsedTime: number;
   private stage: Stage;
   private player: Player;
+  private minimap: Minimap;
   private renderables: Renderable[] = [];
   private animationFrame: number = 0;
 
@@ -37,6 +39,7 @@ export class Game {
       CANVAS_HEIGHT / 2 - DESTINATION_TILE_SIZE / 2
     );
     this.stage = Stage.getThreeHorizontalRoomsStage(this.player);
+    this.minimap = new Minimap(this.player, this.stage);
 
     this.start();
   }
@@ -46,7 +49,8 @@ export class Game {
 
     this.renderables.push(this.stage);
     this.renderables.push(this.player);
-    this.renderables.push(this.stage.backdropRoomChangeAnimation);
+    this.renderables.push(this.minimap);
+    this.renderables.push(this.stage.backdropRoomChangeAnimation); // Should be last; on top layer
 
     window.addEventListener('keydown', this.handleKeyboardKeydown);
     window.addEventListener('keyup', this.handleKeyboardKeyup);
@@ -148,6 +152,7 @@ export class Game {
           CANVAS_HEIGHT / 2 - DESTINATION_TILE_SIZE / 2
         );
         this.stage = Stage.getThreeHorizontalRoomsStage(this.player);
+        this.minimap = new Minimap(this.player, this.stage);
         this.renderables = [];
         this.start();
         if (this.player.getDebugMode()) this.player.toggleDebugMode();
