@@ -140,19 +140,36 @@ export class Stage extends Renderable {
     }
 
     let currentRoomCoords: Coords = { x: 0, y: 0 } as Coords;
-    for (let i = 0; i < numberOfRooms - 1; i++) {
-      let randomNumber = randomInt(1, 4) as keyof typeof DOOR_POSITION_MAP;
-      let doorPosition: DoorPosition = DOOR_POSITION_MAP[randomNumber];
-      let [doorCoords, doorTargetCoords] = Door.getDoorCoords(doorPosition);
 
-      while (
-        (doorCoords && rooms[i].hasDoorAt(doorCoords)) ||
-        (doorTargetCoords && rooms[i + 1].hasDoorAt(doorTargetCoords))
-      ) {
+    for (let i = 0; i < numberOfRooms - 1; i++) {
+      let randomNumber: keyof typeof DOOR_POSITION_MAP;
+      let doorPosition: DoorPosition;
+      let doorCoords: Coords | null;
+      let doorTargetCoords: Coords | null;
+      let loopIterations = 0;
+
+      do {
         randomNumber = randomInt(1, 4) as keyof typeof DOOR_POSITION_MAP;
         doorPosition = DOOR_POSITION_MAP[randomNumber];
         [doorCoords, doorTargetCoords] = Door.getDoorCoords(doorPosition);
+        loopIterations++;
+        if (loopIterations >= 50) break;
+      } while (
+        (doorCoords && rooms[i].hasDoorAt(doorCoords)) ||
+        (doorTargetCoords && rooms[i + 1].hasDoorAt(doorTargetCoords)) ||
+        Room.getRoomAtCoords(
+          rooms,
+          Room.addDoorPositionToCoords(currentRoomCoords, doorPosition)
+        )
+      );
+      if (loopIterations >= 50) {
+        break;
       }
+      currentRoomCoords = Room.addDoorPositionToCoords(
+        currentRoomCoords,
+        doorPosition
+      );
+      rooms[i + 1].coords = currentRoomCoords;
 
       rooms[i].addDoors([new Door(rooms[i].id, rooms[i + 1].id, doorPosition)]);
       rooms[i + 1].addDoors([
@@ -162,11 +179,62 @@ export class Stage extends Renderable {
           DOOR_POSITION_OPPOSITE[doorPosition]
         ),
       ]);
-      currentRoomCoords = Room.getNewRoomCoordsFromNewDoorPosition(
-        currentRoomCoords,
-        doorPosition
+
+      // Connect new room to existing rooms with doors
+      const possibleRooms = [
+        {
+          room: Room.getRoomAtCoords(rooms, {
+            x: currentRoomCoords.x - 1,
+            y: currentRoomCoords.y,
+          } as Coords),
+          doorPosition: DOOR_POSITION.LEFT,
+        },
+        {
+          room: Room.getRoomAtCoords(rooms, {
+            x: currentRoomCoords.x + 1,
+            y: currentRoomCoords.y,
+          } as Coords),
+          doorPosition: DOOR_POSITION.RIGHT,
+        },
+        {
+          room: Room.getRoomAtCoords(rooms, {
+            x: currentRoomCoords.x,
+            y: currentRoomCoords.y - 1,
+          } as Coords),
+          doorPosition: DOOR_POSITION.UP,
+        },
+        {
+          room: Room.getRoomAtCoords(rooms, {
+            x: currentRoomCoords.x,
+            y: currentRoomCoords.y + 1,
+          } as Coords),
+          doorPosition: DOOR_POSITION.DOWN,
+        },
+      ];
+      const existingRooms = possibleRooms.filter(
+        (possibleRoom) => !!possibleRoom.room
       );
-      rooms[i + 1].coords = currentRoomCoords;
+
+      if (existingRooms.length > 0) {
+        existingRooms.forEach((existingRoom) => {
+          if (!rooms[i + 1].hasDoorAt(existingRoom.room!.coords)) {
+            rooms[i + 1].addDoors([
+              new Door(
+                rooms[i + 1].id,
+                existingRoom.room!.id,
+                existingRoom.doorPosition
+              ),
+            ]);
+            existingRoom.room!.addDoors([
+              new Door(
+                existingRoom.room!.id,
+                rooms[i + 1].id,
+                DOOR_POSITION_OPPOSITE[existingRoom.doorPosition]
+              ),
+            ]);
+          }
+        });
+      }
     }
 
     return new Stage(`Random ${numberOfRooms} Rooms Stage`, rooms, player);

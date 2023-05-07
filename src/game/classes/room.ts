@@ -34,18 +34,24 @@ export class Room extends Renderable {
     );
   }
 
-  static getNewRoomCoordsFromNewDoorPosition(
+  static getRoomAtCoords(rooms: Room[], coords: Coords): Room | undefined {
+    return rooms.find(
+      (room) => room.coords.x === coords.x && room.coords.y === coords.y
+    );
+  }
+
+  static addDoorPositionToCoords(
     coords: Coords,
-    position: DoorPosition
+    doorPosition: DoorPosition
   ): Coords {
     const newCoords = { x: coords.x, y: coords.y } as Coords;
-    if (position === DOOR_POSITION.DOWN) {
+    if (doorPosition === DOOR_POSITION.DOWN) {
       newCoords.y++;
-    } else if (position === DOOR_POSITION.UP) {
+    } else if (doorPosition === DOOR_POSITION.UP) {
       newCoords.y--;
-    } else if (position === DOOR_POSITION.LEFT) {
+    } else if (doorPosition === DOOR_POSITION.LEFT) {
       newCoords.x--;
-    } else if (position === DOOR_POSITION.RIGHT) {
+    } else if (doorPosition === DOOR_POSITION.RIGHT) {
       newCoords.x++;
     }
 
