@@ -32,8 +32,8 @@ export class Minimap extends Renderable {
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    const MINIMAP_ROOM_WIDTH = this.width / 6;
-    const MINIMAP_ROOM_HEIGHT = this.height / 6;
+    const MINIMAP_ROOM_WIDTH = this.width / 10;
+    const MINIMAP_ROOM_HEIGHT = this.height / 10;
     const MINIMAP_CURRENT_ROOM_POSITION_X =
       this.position.x + this.width / 2 - MINIMAP_ROOM_WIDTH / 2;
     const MINIMAP_CURRENT_ROOM_POSITION_Y =
@@ -73,47 +73,43 @@ export class Minimap extends Renderable {
       // Nearby rooms
       ctx.strokeStyle = '#FFFFFF';
       ctx.fillStyle = '#FFFFFF';
-      currentRoom.map.doors.forEach((door) => {
-        ctx.beginPath();
-        let X_POSITION = 0;
-        let Y_POSITION = 0;
-        if (door.doorPosition === DOOR_POSITION.RIGHT) {
-          X_POSITION =
-            MINIMAP_CURRENT_ROOM_POSITION_X +
-            MINIMAP_ROOM_DISTANCE +
-            MINIMAP_ROOM_WIDTH;
-          Y_POSITION = MINIMAP_CURRENT_ROOM_POSITION_Y;
-        } else if (door.doorPosition === DOOR_POSITION.LEFT) {
-          X_POSITION =
-            MINIMAP_CURRENT_ROOM_POSITION_X -
-            MINIMAP_ROOM_DISTANCE -
-            MINIMAP_ROOM_WIDTH;
-          Y_POSITION = MINIMAP_CURRENT_ROOM_POSITION_Y;
-        } else if (door.doorPosition === DOOR_POSITION.UP) {
-          X_POSITION = MINIMAP_CURRENT_ROOM_POSITION_X;
-          Y_POSITION =
-            MINIMAP_CURRENT_ROOM_POSITION_Y -
-            MINIMAP_ROOM_DISTANCE -
-            MINIMAP_ROOM_HEIGHT;
-        } else if (door.doorPosition === DOOR_POSITION.DOWN) {
-          X_POSITION = MINIMAP_CURRENT_ROOM_POSITION_X;
-          Y_POSITION =
-            MINIMAP_CURRENT_ROOM_POSITION_Y +
-            MINIMAP_ROOM_DISTANCE +
-            MINIMAP_ROOM_HEIGHT;
-        } else {
-          return;
-        }
 
-        ctx.rect(
-          X_POSITION,
-          Y_POSITION,
-          MINIMAP_ROOM_WIDTH,
-          MINIMAP_ROOM_HEIGHT
-        );
-        ctx.stroke();
-        ctx.fill();
-      });
+      this.stage.rooms
+        .filter((room) => room.id !== this.stage.currentRoomId)
+        .forEach((room) => {
+          const nearbyRoomPositionX =
+            MINIMAP_CURRENT_ROOM_POSITION_X +
+            MINIMAP_ROOM_DISTANCE * room.coords.x +
+            MINIMAP_ROOM_WIDTH * room.coords.x -
+            currentRoom.coords.x * MINIMAP_ROOM_WIDTH -
+            currentRoom.coords.x * MINIMAP_ROOM_DISTANCE;
+          const nearbyRoomPositionY =
+            MINIMAP_CURRENT_ROOM_POSITION_Y +
+            MINIMAP_ROOM_DISTANCE * room.coords.y +
+            MINIMAP_ROOM_HEIGHT * room.coords.y -
+            currentRoom.coords.y * MINIMAP_ROOM_HEIGHT -
+            currentRoom.coords.y * MINIMAP_ROOM_DISTANCE;
+
+          if (
+            nearbyRoomPositionX < this.position.x ||
+            nearbyRoomPositionX + MINIMAP_ROOM_WIDTH >
+              this.position.x + this.width ||
+            nearbyRoomPositionY < this.position.y ||
+            nearbyRoomPositionY + MINIMAP_ROOM_HEIGHT >
+              this.position.y + this.height
+          ) {
+            return;
+          }
+          ctx.beginPath();
+          ctx.rect(
+            nearbyRoomPositionX,
+            nearbyRoomPositionY,
+            MINIMAP_ROOM_WIDTH,
+            MINIMAP_ROOM_HEIGHT
+          );
+          ctx.stroke();
+          ctx.fill();
+        });
     }
 
     ctx.restore();
