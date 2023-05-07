@@ -43,7 +43,7 @@ export class Map extends Sprite {
   }
 
   addDoors(doors: Door[]) {
-    this.doors = doors;
+    this.doors = [...this.doors, ...doors];
     doors.forEach((door) => {
       const [doorTiles, doorItems] = door.getDoorRenderElements();
       doorTiles.forEach((doorTile) => {

@@ -38,7 +38,7 @@ export class Game {
       CANVAS_WIDTH / 2 - DESTINATION_TILE_SIZE / 2,
       CANVAS_HEIGHT / 2 - DESTINATION_TILE_SIZE / 2
     );
-    this.stage = Stage.getThreeHorizontalRoomsStage(this.player);
+    this.stage = Stage.getRandomsRoomsStage(this.player);
     this.minimap = new Minimap(this.player, this.stage);
 
     this.start();
@@ -151,7 +151,7 @@ export class Game {
           CANVAS_WIDTH / 2 - DESTINATION_TILE_SIZE / 2,
           CANVAS_HEIGHT / 2 - DESTINATION_TILE_SIZE / 2
         );
-        this.stage = Stage.getThreeHorizontalRoomsStage(this.player);
+        this.stage = Stage.getRandomsRoomsStage(this.player);
         this.minimap = new Minimap(this.player, this.stage);
         this.renderables = [];
         this.start();

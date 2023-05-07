@@ -4,12 +4,26 @@ import { StageId } from '../types/stage';
 import { Room } from './room';
 import { RoomId } from '../types/room';
 import { Door } from './door';
-import { Coords } from '../types/shared';
-import { DESTINATION_TILE_SIZE } from '../constants/game';
+import { DoorPosition } from '../types/shared';
 import { Renderable } from './renderable';
 import { DOOR_POSITION } from '../constants/doors';
 import { Player } from './player';
 import { BackdropRoomChangeAnimation } from './backdropRoomChangeAnimation';
+import { randomInt } from '../../utils/random';
+
+const DOOR_POSITION_MAP = {
+  1: DOOR_POSITION.DOWN,
+  2: DOOR_POSITION.LEFT,
+  3: DOOR_POSITION.RIGHT,
+  4: DOOR_POSITION.UP,
+} as const;
+
+const DOOR_POSITION_OPPOSITE = {
+  [DOOR_POSITION.DOWN]: DOOR_POSITION.UP,
+  [DOOR_POSITION.UP]: DOOR_POSITION.DOWN,
+  [DOOR_POSITION.LEFT]: DOOR_POSITION.RIGHT,
+  [DOOR_POSITION.RIGHT]: DOOR_POSITION.LEFT,
+} as const;
 
 export class Stage extends Renderable {
   id: StageId;
@@ -86,67 +100,51 @@ export class Stage extends Renderable {
     const room1 = Room.getEmptyRoom();
     const room2 = Room.getEmptyRoom();
     const room3 = Room.getEmptyRoom();
-    room1.addDoors([
-      new Door(
-        {
-          x: room1.map.width / DESTINATION_TILE_SIZE - 1,
-          y: 7,
-        } as Coords,
-        room1.id,
-        {
-          x: 1,
-          y: 7,
-        } as Coords,
-        room2.id,
-        DOOR_POSITION.RIGHT
-      ),
-    ]);
+    room1.addDoors([new Door(room1.id, room2.id, DOOR_POSITION.RIGHT)]);
     room2.addDoors([
-      new Door(
-        {
-          x: 0,
-          y: 7,
-        } as Coords,
-        room2.id,
-        {
-          x: room2.map.width / DESTINATION_TILE_SIZE - 2,
-          y: 7,
-        } as Coords,
-        room1.id,
-        DOOR_POSITION.LEFT
-      ),
-      new Door(
-        {
-          x: room2.map.width / DESTINATION_TILE_SIZE - 1,
-          y: 7,
-        } as Coords,
-        room2.id,
-        {
-          x: 1,
-          y: 7,
-        } as Coords,
-        room3.id,
-        DOOR_POSITION.RIGHT
-      ),
+      new Door(room2.id, room1.id, DOOR_POSITION.LEFT),
+      new Door(room2.id, room3.id, DOOR_POSITION.RIGHT),
     ]);
-    room3.addDoors([
-      new Door(
-        {
-          x: 0,
-          y: 7,
-        } as Coords,
-        room3.id,
-        {
-          x: room3.map.width / DESTINATION_TILE_SIZE - 2,
-          y: 7,
-        } as Coords,
-        room2.id,
-        DOOR_POSITION.LEFT
-      ),
-    ]);
+    room3.addDoors([new Door(room3.id, room2.id, DOOR_POSITION.LEFT)]);
 
     const rooms: Room[] = [room1, room2, room3];
 
     return new Stage('Three Horizontal Rooms', rooms, player);
+  }
+
+  static getRandomsRoomsStage(
+    player: Player,
+    numberOfRooms: number = 6
+  ): Stage {
+    const rooms: Room[] = [];
+    for (let i = 0; i < numberOfRooms; i++) {
+      rooms.push(Room.getEmptyRoom());
+    }
+
+    for (let i = 0; i < numberOfRooms - 1; i++) {
+      let randomNumber = randomInt(1, 4) as keyof typeof DOOR_POSITION_MAP;
+      let doorPosition: DoorPosition = DOOR_POSITION_MAP[randomNumber];
+      let [doorCoords, doorTargetCoords] = Door.getDoorCoords(doorPosition);
+
+      while (
+        (doorCoords && rooms[i].hasRoomAt(doorCoords)) ||
+        (doorTargetCoords && rooms[i + 1].hasRoomAt(doorTargetCoords))
+      ) {
+        randomNumber = randomInt(1, 4) as keyof typeof DOOR_POSITION_MAP;
+        doorPosition = DOOR_POSITION_MAP[randomNumber];
+        [doorCoords, doorTargetCoords] = Door.getDoorCoords(doorPosition);
+      }
+
+      rooms[i].addDoors([new Door(rooms[i].id, rooms[i + 1].id, doorPosition)]);
+      rooms[i + 1].addDoors([
+        new Door(
+          rooms[i + 1].id,
+          rooms[i].id,
+          DOOR_POSITION_OPPOSITE[doorPosition]
+        ),
+      ]);
+    }
+
+    return new Stage(`Random ${numberOfRooms} Rooms Stage`, rooms, player);
   }
 }
