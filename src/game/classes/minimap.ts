@@ -22,8 +22,8 @@ export class Minimap extends Renderable {
     x: DESTINATION_TILE_SIZE * 1.5,
     y: DESTINATION_TILE_SIZE * 1.5,
   } as Vector2;
-  private player;
-  private stage;
+  private player: Player;
+  private stage: Stage;
 
   constructor(player: Player, stage: Stage) {
     super();
@@ -75,7 +75,9 @@ export class Minimap extends Renderable {
       ctx.fillStyle = COLORS.minimapNearbyRoom;
 
       this.stage.rooms
-        .filter((room) => room.id !== this.stage.currentRoomId)
+        .filter(
+          (room) => room.id !== this.stage.currentRoomId && room.isRevealed
+        )
         .forEach((room) => {
           const nearbyRoomPositionX =
             MINIMAP_CURRENT_ROOM_POSITION_X +

@@ -55,6 +55,7 @@ export class Stage extends Renderable {
     );
     this.backdropRoomChangeAnimation = backdropRoomChangeAnimation;
     this.currentRoomId = currentRoomId || rooms[0].id;
+    this.revealNearbyRooms();
   }
 
   render(ctx: CanvasRenderingContext2D): void {
@@ -90,10 +91,27 @@ export class Stage extends Renderable {
     if (!newCurrentRoom) return;
 
     this.currentRoomId = roomId;
+    this.revealNearbyRooms();
   }
 
   getCurrentRoom(): Room | undefined {
     return this.rooms.find((room) => room.id === this.currentRoomId);
+  }
+
+  revealNearbyRooms() {
+    const currentRoom = this.getCurrentRoom();
+
+    if (!currentRoom) return;
+
+    const nearbyRooms = currentRoom.map.doors
+      .map((door) => {
+        return this.rooms.find((room) => room.id === door.targetRoomId);
+      })
+      .filter((room: Room | undefined): room is Room => !!room);
+
+    nearbyRooms.forEach((room) => {
+      room.isRevealed = true;
+    });
   }
 
   static getThreeHorizontalRoomsStage(player: Player): Stage {

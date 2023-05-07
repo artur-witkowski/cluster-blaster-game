@@ -11,6 +11,7 @@ export class Room extends Renderable {
   id: RoomId;
   map: Map;
   coords: Coords;
+  isRevealed: boolean = false;
 
   constructor(map: Map, coords?: Coords) {
     super();
