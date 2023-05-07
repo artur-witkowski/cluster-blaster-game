@@ -4,7 +4,7 @@ import { StageId } from '../types/stage';
 import { Room } from './room';
 import { RoomId } from '../types/room';
 import { Door } from './door';
-import { DoorPosition } from '../types/shared';
+import { Coords, DoorPosition } from '../types/shared';
 import { Renderable } from './renderable';
 import { DOOR_POSITION } from '../constants/doors';
 import { Player } from './player';
@@ -121,14 +121,15 @@ export class Stage extends Renderable {
       rooms.push(Room.getEmptyRoom());
     }
 
+    let currentRoomCoords: Coords = { x: 0, y: 0 } as Coords;
     for (let i = 0; i < numberOfRooms - 1; i++) {
       let randomNumber = randomInt(1, 4) as keyof typeof DOOR_POSITION_MAP;
       let doorPosition: DoorPosition = DOOR_POSITION_MAP[randomNumber];
       let [doorCoords, doorTargetCoords] = Door.getDoorCoords(doorPosition);
 
       while (
-        (doorCoords && rooms[i].hasRoomAt(doorCoords)) ||
-        (doorTargetCoords && rooms[i + 1].hasRoomAt(doorTargetCoords))
+        (doorCoords && rooms[i].hasDoorAt(doorCoords)) ||
+        (doorTargetCoords && rooms[i + 1].hasDoorAt(doorTargetCoords))
       ) {
         randomNumber = randomInt(1, 4) as keyof typeof DOOR_POSITION_MAP;
         doorPosition = DOOR_POSITION_MAP[randomNumber];
@@ -143,6 +144,11 @@ export class Stage extends Renderable {
           DOOR_POSITION_OPPOSITE[doorPosition]
         ),
       ]);
+      currentRoomCoords = Room.getNewRoomCoordsFromNewDoorPosition(
+        currentRoomCoords,
+        doorPosition
+      );
+      rooms[i + 1].coords = currentRoomCoords;
     }
 
     return new Stage(`Random ${numberOfRooms} Rooms Stage`, rooms, player);
