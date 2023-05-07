@@ -58,8 +58,8 @@ export class Minimap extends Renderable {
       (room) => room.id === this.stage.currentRoomId
     );
     if (currentRoom) {
-      ctx.strokeStyle = 'orange';
-      ctx.fillStyle = 'orange';
+      ctx.strokeStyle = COLORS.minimapCurrentRoom;
+      ctx.fillStyle = COLORS.minimapCurrentRoom;
       ctx.beginPath();
       ctx.rect(
         MINIMAP_CURRENT_ROOM_POSITION_X,
@@ -71,8 +71,8 @@ export class Minimap extends Renderable {
       ctx.fill();
 
       // Nearby rooms
-      ctx.strokeStyle = '#FFFFFF';
-      ctx.fillStyle = '#FFFFFF';
+      ctx.strokeStyle = COLORS.minimapNearbyRoom;
+      ctx.fillStyle = COLORS.minimapNearbyRoom;
 
       this.stage.rooms
         .filter((room) => room.id !== this.stage.currentRoomId)
