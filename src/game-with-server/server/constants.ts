@@ -1,0 +1,14 @@
+export const EVENTS_TO_SERVER = {
+  GAME: {
+    CREATE_NEW_LOBBY: 'SERVER::GAME::CREATE_NEW_LOBBY',
+  },
+  PLAYER: {
+    UPDATE_DATA: 'SERVER::PLAYER::UPDATE_DATA',
+  },
+};
+
+export const EVENTS_TO_CLIENT = {
+  GAME: {
+    UPDATE_GAME_DATA: 'CLIENT::GAME::UPDATE_GAME_DATA',
+  },
+};
