@@ -1,9 +1,9 @@
 import { io } from 'socket.io-client';
 import { EVENTS_TO_CLIENT, EVENTS_TO_SERVER } from './constants';
 import { gameInstance } from '../../components/gameCanvas/gameInstance';
+import { Vector2 } from '../types/shared';
 
-const WS_URL = 'http://localhost:5005/';
-const socket = io(WS_URL);
+const socket = io(import.meta.env.VITE_WS_SERVER_URL);
 
 socket.on('connect', () => {
   console.log('connected');
@@ -11,8 +11,9 @@ socket.on('connect', () => {
 
 type PlayerPayload = {
   id: string;
-  x: number;
-  y: number;
+  position: Vector2 | null;
+  velocity: Vector2;
+  direction: Vector2;
 };
 
 export const sendPlayerData = (playerPayload: PlayerPayload) => {

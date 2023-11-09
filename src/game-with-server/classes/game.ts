@@ -58,11 +58,19 @@ export class Game {
     while (this.lag >= FRAME_DURATION) {
       this.update();
       this.lag -= FRAME_DURATION;
-      sendPlayerData({
-        id: this.myPlayer?.id || '',
-        x: this.myPlayer?.getPositionX() || 0,
-        y: this.myPlayer?.getPositionY() || 0,
-      });
+      const myPlayerVelocity = this.myPlayer?.getVelocity();
+      if (
+        this.myPlayer &&
+        myPlayerVelocity &&
+        (myPlayerVelocity.x !== 0 || myPlayerVelocity.y !== 0)
+      ) {
+        sendPlayerData({
+          id: this.myPlayer?.id || '',
+          position: this.myPlayer.getPosition(),
+          velocity: this.myPlayer.getVelocity(),
+          direction: this.myPlayer.getDirection(),
+        });
+      }
     }
 
     this.render();
@@ -70,6 +78,9 @@ export class Game {
 
   private update() {
     this.myPlayer?.update(this.keyPressed);
+    this.allyPlayers.forEach((player) => {
+      player.update();
+    });
   }
 
   private render() {
@@ -151,15 +162,28 @@ export class Game {
   }
 
   handleUpdateFromServer(data: {
-    players: { clientId: string; position: Vector2 }[];
+    players: {
+      clientId: string;
+      position: Vector2;
+      velocity: Vector2;
+      direction: Vector2;
+    }[];
   }) {
     data.players.forEach((playerData) => {
       const player = this.allyPlayers.find((p) => p.id === playerData.clientId);
       if (player) {
-        player.setPositionFromServer(playerData.position);
+        player.setPlayerDataFromServer({
+          position: playerData.position,
+          velocity: playerData.velocity,
+          direction: playerData.direction,
+        });
       } else if (playerData.clientId !== this.myPlayer?.id) {
         const newPlayer = new Player(playerData.clientId);
-        newPlayer.setPositionFromServer(playerData.position);
+        newPlayer.setPlayerDataFromServer({
+          position: playerData.position,
+          velocity: playerData.velocity,
+          direction: playerData.direction,
+        });
         this.addAllyPlayer(newPlayer);
       }
     });

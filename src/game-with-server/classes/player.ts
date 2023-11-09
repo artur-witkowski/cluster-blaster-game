@@ -16,6 +16,7 @@ export class Player extends Renderable {
   private velocity: Vector2;
   private direction: Vector2;
   private image: HTMLImageElement;
+  private lastServerPositionUpdateTimestamp: number;
 
   constructor(id: string) {
     super();
@@ -25,6 +26,7 @@ export class Player extends Renderable {
     this.direction = { x: 0, y: 0 } as Vector2;
     this.image = new Image();
     this.image.src = characterBase;
+    this.lastServerPositionUpdateTimestamp = Date.now();
   }
 
   render(ctx: CanvasRenderingContext2D) {
@@ -41,22 +43,24 @@ export class Player extends Renderable {
     );
   }
 
-  update(keyPressed: Set<(typeof KEYS)[keyof typeof KEYS]>) {
-    // Update the direction based on the keys pressed
-    if (keyPressed.has(KEYS.LEFT) && !keyPressed.has(KEYS.RIGHT)) {
-      this.changeDirection(-1, null);
-    } else if (keyPressed.has(KEYS.RIGHT) && !keyPressed.has(KEYS.LEFT)) {
-      this.changeDirection(1, null);
-    } else {
-      this.changeDirection(0, null);
-    }
+  update(keyPressed?: Set<(typeof KEYS)[keyof typeof KEYS]>) {
+    if (keyPressed) {
+      // Update the direction based on the keys pressed
+      if (keyPressed.has(KEYS.LEFT) && !keyPressed.has(KEYS.RIGHT)) {
+        this.changeDirection(-1, null);
+      } else if (keyPressed.has(KEYS.RIGHT) && !keyPressed.has(KEYS.LEFT)) {
+        this.changeDirection(1, null);
+      } else {
+        this.changeDirection(0, null);
+      }
 
-    if (keyPressed.has(KEYS.UP) && !keyPressed.has(KEYS.DOWN)) {
-      this.changeDirection(null, -1);
-    } else if (keyPressed.has(KEYS.DOWN) && !keyPressed.has(KEYS.UP)) {
-      this.changeDirection(null, 1);
-    } else {
-      this.changeDirection(null, 0);
+      if (keyPressed.has(KEYS.UP) && !keyPressed.has(KEYS.DOWN)) {
+        this.changeDirection(null, -1);
+      } else if (keyPressed.has(KEYS.DOWN) && !keyPressed.has(KEYS.UP)) {
+        this.changeDirection(null, 1);
+      } else {
+        this.changeDirection(null, 0);
+      }
     }
 
     // Constantly slowing down the player if not moving
@@ -87,16 +91,34 @@ export class Player extends Renderable {
     }
   }
 
-  getPositionX() {
-    return this.position.x;
+  getPosition() {
+    return this.position;
   }
 
-  getPositionY() {
-    return this.position.y;
+  getVelocity() {
+    return this.velocity;
   }
 
-  setPositionFromServer(position: Vector2) {
-    this.position = position;
+  getDirection() {
+    return this.direction;
+  }
+
+  setPlayerDataFromServer({
+    position,
+    velocity,
+    direction,
+  }: {
+    position: Vector2;
+    velocity: Vector2;
+    direction: Vector2;
+  }) {
+    const now = Date.now();
+    if (now - this.lastServerPositionUpdateTimestamp > 1000) {
+      this.position = position;
+      this.lastServerPositionUpdateTimestamp = now;
+    }
+    this.velocity = velocity;
+    this.direction = direction;
   }
 
   private changePosition(x: number, y: number) {
