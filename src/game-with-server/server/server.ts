@@ -3,7 +3,7 @@ import { EVENTS_TO_CLIENT, EVENTS_TO_SERVER } from './constants';
 import { gameInstance } from '../../components/gameCanvas/gameInstance';
 import { Vector2 } from '../types/shared';
 
-const socket = io(import.meta.env.VITE_WS_SERVER_URL);
+const socket = io(import.meta.env.VITE_WS_SERVER_URL, { secure: true });
 
 socket.on('connect', () => {
   console.log('connected');
