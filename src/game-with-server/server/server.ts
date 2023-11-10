@@ -4,7 +4,6 @@ import { gameInstance } from '../../components/gameCanvas/gameInstance';
 import { Vector2 } from '../types/shared';
 
 const socket = io(import.meta.env.VITE_WS_SERVER_URL, {
-  secure: true,
   transports: ['websocket', 'polling', 'flashsocket'],
 });
 
