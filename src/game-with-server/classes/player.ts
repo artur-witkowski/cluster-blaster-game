@@ -12,15 +12,17 @@ import {
 
 export class Player extends Renderable {
   id: string;
+  private username: string;
   private position: Vector2;
   private velocity: Vector2;
   private direction: Vector2;
   private image: HTMLImageElement;
   private lastServerPositionUpdateTimestamp: number;
 
-  constructor(id: string) {
+  constructor(id: string, username: string) {
     super();
     this.id = id;
+    this.username = username;
     this.position = { x: 0, y: 0 } as Vector2;
     this.velocity = { x: 0, y: 0 } as Vector2;
     this.direction = { x: 0, y: 0 } as Vector2;
@@ -41,6 +43,10 @@ export class Player extends Renderable {
       48, // this.width, // Destination image width and height
       48 // this.height
     );
+    ctx.font = '12px Comic Sans MS';
+    ctx.fillStyle = 'red';
+    ctx.textAlign = 'center';
+    ctx.fillText(this.username, this.position.x + 8, this.position.y);
   }
 
   update(keyPressed?: Set<(typeof KEYS)[keyof typeof KEYS]>) {
@@ -101,6 +107,10 @@ export class Player extends Renderable {
 
   getDirection() {
     return this.direction;
+  }
+
+  getUsername() {
+    return this.username;
   }
 
   setPlayerDataFromServer({

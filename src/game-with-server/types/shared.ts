@@ -7,3 +7,9 @@ export type Coords = {
   x: number;
   y: number;
 } & { readonly Coords: unique symbol };
+
+export const GAME_STATUSES = {
+  LOBBY: 'LOBBY',
+  IN_PROGRESS: 'IN_PROGRESS',
+  FINISHED: 'FINISHED',
+} as const;

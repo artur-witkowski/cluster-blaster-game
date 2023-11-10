@@ -1,3 +1,4 @@
+import { useLobbyStore } from '../../stores/lobbyStore';
 import { FRAME_DURATION } from '../constants/game';
 import { KEYS } from '../constants/keyboard';
 import { sendPlayerData } from '../server/server';
@@ -66,6 +67,7 @@ export class Game {
       ) {
         sendPlayerData({
           id: this.myPlayer?.id || '',
+          gameId: useLobbyStore.getState().gameId || '',
           position: this.myPlayer.getPosition(),
           velocity: this.myPlayer.getVelocity(),
           direction: this.myPlayer.getDirection(),
@@ -157,39 +159,40 @@ export class Game {
     this.allyPlayers.push(player);
   }
 
+  getAllyPlayers() {
+    return this.allyPlayers;
+  }
+
   setMyPlayer(player: Player) {
     this.myPlayer = player;
   }
 
+  getMyPlayer() {
+    return this.myPlayer;
+  }
+
   handleUpdateFromServer(data: {
     players: {
-      clientId: string;
+      id: string;
+      username: string;
       position: Vector2;
       velocity: Vector2;
       direction: Vector2;
     }[];
   }) {
     data.players.forEach((playerData) => {
-      const player = this.allyPlayers.find((p) => p.id === playerData.clientId);
+      const player = this.allyPlayers.find((p) => p.id === playerData.id);
       if (player) {
         player.setPlayerDataFromServer({
           position: playerData.position,
           velocity: playerData.velocity,
           direction: playerData.direction,
         });
-      } else if (playerData.clientId !== this.myPlayer?.id) {
-        const newPlayer = new Player(playerData.clientId);
-        newPlayer.setPlayerDataFromServer({
-          position: playerData.position,
-          velocity: playerData.velocity,
-          direction: playerData.direction,
-        });
-        this.addAllyPlayer(newPlayer);
       }
     });
 
     this.allyPlayers = this.allyPlayers.filter((player) =>
-      data.players.find((p) => p.clientId === player.id)
+      data.players.find((p) => p.id === player.id)
     );
   }
 }

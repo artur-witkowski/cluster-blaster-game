@@ -1,9 +1,12 @@
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { createUseStyles } from 'react-jss';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../game/constants/game';
+import { useNavigate } from 'react-router-dom';
 
 import { useInitGame } from './useInitGame';
 import { COLORS } from '../../utils/colors';
+import { useLobbyStore } from '../../stores/lobbyStore';
+import { routes } from '../router';
 
 const useStyles = createUseStyles({
   canvasContainer: {
@@ -38,7 +41,15 @@ const useStyles = createUseStyles({
 const GameCanvas = () => {
   const classes = useStyles();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const gameId = useLobbyStore((state) => state.gameId);
+  const navigate = useNavigate();
   useInitGame({ canvasRef });
+
+  useEffect(() => {
+    if (!gameId) {
+      navigate(routes.createRoom.path);
+    }
+  }, [gameId]);
 
   return (
     <div className={classes.canvasContainer}>
